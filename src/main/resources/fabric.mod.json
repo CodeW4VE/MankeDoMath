@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "mankedomath",
+	"version": "${version}",
+	"name": "MankeDoMath",
+	"description": "A calculator inside Minecraft that knows what a shulker is. Work out farm rates, item counts and timings without leaving the game: /math 3456 items in sh, /math 5sh / 2h. Server-side only: players need nothing installed, the vanilla client autocompletes the command.",
+	"authors": [
+		"tvtvirus"
+	],
+	"contact": {
+		"homepage": "https://w4ve.xyz/",
+		"sources": "https://github.com/CodeW4VE/MankeDoMath"
+	},
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"xyz.w4ve.mankedomath.MankeDoMath"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.16.0",
+		"minecraft": ">=1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
