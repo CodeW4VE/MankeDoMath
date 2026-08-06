@@ -20,8 +20,10 @@ import net.minecraft.server.level.ServerPlayer;
 import xyz.w4ve.mankedomath.math.Formatter;
 import xyz.w4ve.mankedomath.math.MathError;
 import xyz.w4ve.mankedomath.math.MathParser;
+import xyz.w4ve.mankedomath.math.Quips;
 import xyz.w4ve.mankedomath.math.Value;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -46,8 +48,8 @@ public final class MathCommand {
 		// so the pieces share one root without knowing about each other.
 		dispatcher.register(Commands.literal("w4ve").then(tree("math")));
 		if (config.shortAlias()) {
-			String alias = config.alias();
-			if (!alias.equals("w4ve")) dispatcher.register(tree(alias));
+			// /math and /m by default. Typing out /math to add two numbers gets old.
+			for (String alias : config.aliases()) dispatcher.register(tree(alias));
 		}
 	}
 
@@ -95,7 +97,7 @@ public final class MathCommand {
 			} else {
 				reader.setCursor(expression.length());
 			}
-			throw MATH_ERROR.createWithContext(reader, error.getMessage());
+			throw MATH_ERROR.createWithContext(reader, Quips.decorate(error, config.funnyErrors()));
 		}
 
 		Value value = result.value();
@@ -166,6 +168,15 @@ public final class MathCommand {
 						.withStyle(ChatFormatting.DARK_GRAY))
 				.append(Component.literal(name + " share <expr>").withStyle(ChatFormatting.WHITE))
 				.append(Component.literal(" tells everyone.").withStyle(ChatFormatting.DARK_GRAY)), false);
+
+		// The short aliases are the whole point of having them, so say they exist.
+		List<String> others = config.aliases().stream().skip(1).map(a -> "/" + a).toList();
+		if (config.shortAlias() && !others.isEmpty()) {
+			source.sendSuccess(() -> Component.literal("  also ").withStyle(ChatFormatting.DARK_GRAY)
+					.append(Component.literal(String.join(" and ", others)).withStyle(ChatFormatting.WHITE))
+					.append(Component.literal(", same thing, fewer letters.")
+							.withStyle(ChatFormatting.DARK_GRAY)), false);
+		}
 		return 1;
 	}
 

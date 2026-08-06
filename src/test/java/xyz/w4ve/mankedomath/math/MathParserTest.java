@@ -230,6 +230,47 @@ class MathParserTest {
 		assertEquals(Dim.ITEM, result.value().dim());
 	}
 
+	// ---- error jokes ------------------------------------------------------
+
+	@Test
+	void errorsAreSortedIntoKinds() {
+		assertEquals(MathError.Kind.DIVIDE_BY_ZERO,
+				assertThrows(MathError.class, () -> eval("1/0")).kind());
+		assertEquals(MathError.Kind.MIXED_UNITS,
+				assertThrows(MathError.class, () -> eval("1sb + 1h")).kind());
+		assertEquals(MathError.Kind.TOO_BIG,
+				assertThrows(MathError.class, () -> eval("9^9^9")).kind());
+		assertEquals(MathError.Kind.UNKNOWN_NAME,
+				assertThrows(MathError.class, () -> eval("banana")).kind());
+		assertEquals(MathError.Kind.GENERAL,
+				assertThrows(MathError.class, () -> eval("(1+2")).kind());
+	}
+
+	@Test
+	void theJokeNeverEatsTheReason() {
+		MathError error = assertThrows(MathError.class, () -> eval("1/0"));
+		String funny = Quips.decorate(error, true);
+		// Whatever the joke is, the actual reason has to survive inside it.
+		assertTrue(funny.contains("Cannot divide by zero"), funny);
+		assertTrue(funny.length() > error.getMessage().length());
+		// And with the setting off, nothing is added at all.
+		assertEquals("Cannot divide by zero", Quips.decorate(error, false));
+	}
+
+	@Test
+	void everyQuipIsUsable() {
+		for (var pool : Quips.all()) {
+			assertTrue(pool.size() >= 2, "a pool with one line stops being funny fast");
+			for (String quip : pool) {
+				assertTrue(!quip.isBlank(), "empty quip");
+				// They read as an aside before the real message, so no full stops
+				// of their own and nothing shouted.
+				assertTrue(!quip.endsWith("."), quip);
+				assertEquals(quip.trim(), quip, quip);
+			}
+		}
+	}
+
 	// ---- formatting -------------------------------------------------------
 
 	@Test

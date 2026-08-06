@@ -29,12 +29,13 @@ public record Value(double amount, Dim dim) {
 	}
 
 	public Value divide(Value other) throws MathError {
-		if (other.amount == 0) throw new MathError("Cannot divide by zero");
+		if (other.amount == 0) throw new MathError("Cannot divide by zero", MathError.Kind.DIVIDE_BY_ZERO);
 		return new Value(amount / other.amount, dim.minus(other.dim));
 	}
 
 	public Value modulo(Value other) throws MathError {
-		if (other.amount == 0) throw new MathError("Cannot take a remainder of zero");
+		if (other.amount == 0) throw new MathError("Cannot take a remainder of zero",
+				MathError.Kind.DIVIDE_BY_ZERO);
 		requireSame(other, "take the remainder of");
 		return new Value(amount % other.amount, dim);
 	}
@@ -45,7 +46,8 @@ public record Value(double amount, Dim dim) {
 
 	private void requireSame(Value other, String verb) throws MathError {
 		if (dim.equals(other.dim)) return;
-		throw new MathError("Cannot " + verb + " " + other.dim.describe() + " and " + dim.describe());
+		throw new MathError("Cannot " + verb + " " + other.dim.describe() + " and " + dim.describe(),
+				MathError.Kind.MIXED_UNITS);
 	}
 
 	/** True when the value carries no unit and can be used as an exponent or an angle. */

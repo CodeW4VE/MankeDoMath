@@ -58,7 +58,7 @@ public final class MathParser {
 		// Length first, before anything walks the string even once.
 		if (expression.length() > limits.maxLength()) {
 			throw new MathError("Expression is too long: " + expression.length()
-					+ " characters, the limit is " + limits.maxLength());
+					+ " characters, the limit is " + limits.maxLength(), MathError.Kind.TOO_BIG);
 		}
 
 		List<Token> all = Lexer.tokenize(expression, limits);
@@ -68,7 +68,7 @@ public final class MathParser {
 		}
 		if (ops > limits.maxOperations()) {
 			throw new MathError("Expression does too much: " + ops
-					+ " operations, the limit is " + limits.maxOperations());
+					+ " operations, the limit is " + limits.maxOperations(), MathError.Kind.TOO_BIG);
 		}
 
 		// `in` is split off here instead of being an operator, because its right
@@ -92,15 +92,16 @@ public final class MathParser {
 			body = all.subList(0, split);
 			List<Token> tail = all.subList(split + 1, all.size());
 			if (tail.isEmpty()) {
-				throw new MathError("'in' needs a unit after it, like 'in sh'", all.get(split).position);
+				throw new MathError("'in' needs a unit after it, like 'in sb'", all.get(split).position);
 			}
 			Token unit = tail.get(0);
 			if (tail.size() > 1 || unit.type != Type.NAME) {
-				throw new MathError("'in' takes a single unit, like 'in sh' or 'in stacks'", unit.position);
+				throw new MathError("'in' takes a single unit, like 'in sb' or 'in stacks'", unit.position);
 			}
 			target = Units.find(unit.text);
 			if (target == null) {
-				throw new MathError("Unknown unit '" + unit.text + "'", unit.position);
+				throw new MathError("Unknown unit '" + unit.text + "'", unit.position,
+						MathError.Kind.UNKNOWN_NAME);
 			}
 		}
 		if (body.isEmpty()) throw new MathError("Nothing to calculate");
@@ -116,7 +117,8 @@ public final class MathParser {
 		// they just worked out. A number that already has a unit is another story.
 		if (target != null && !value.dim().isNone() && !value.dim().equals(target.dim())) {
 			throw new MathError("Cannot show " + value.dim().describe() + " in "
-					+ target.name() + ", those are different kinds of thing");
+					+ target.name() + ", those are different kinds of thing", -1,
+					MathError.Kind.MIXED_UNITS);
 		}
 		check(value.amount(), -1);
 		return new Result(value, target);
@@ -219,7 +221,8 @@ public final class MathParser {
 					throw new MathError("'" + token.text + "' is a unit, it needs a number in front of it"
 							+ " (try '1" + token.text + "')", token.position);
 				}
-				throw new MathError("Unknown name '" + token.text + "'", token.position);
+				throw new MathError("Unknown name '" + token.text + "'", token.position,
+						MathError.Kind.UNKNOWN_NAME);
 			}
 			default -> throw new MathError("Unexpected '" + token.text + "'", token.position);
 		}
@@ -257,7 +260,7 @@ public final class MathParser {
 		// Checked before Math.pow runs, so an absurd exponent costs nothing.
 		if (Math.abs(e) > limits.maxExponent()) {
 			throw new MathError("Exponent " + Formatter.plain(e) + " is over the limit of "
-					+ Formatter.plain(limits.maxExponent()), position);
+					+ Formatter.plain(limits.maxExponent()), position, MathError.Kind.TOO_BIG);
 		}
 		if (!base.isPlain()) {
 			if (e != Math.rint(e)) {
@@ -309,7 +312,8 @@ public final class MathParser {
 					case "sqrt" -> sqrt(arg, position);
 					case "log" -> check(Value.of(Math.log10(positive(arg, "log", position))), position);
 					case "ln" -> check(Value.of(Math.log(positive(arg, "ln", position))), position);
-					default -> throw new MathError("Unknown function '" + name.text + "'", position);
+					default -> throw new MathError("Unknown function '" + name.text + "'", position,
+							MathError.Kind.UNKNOWN_NAME);
 				};
 			}
 		}
@@ -360,7 +364,8 @@ public final class MathParser {
 	/** Infinity and NaN never leave the parser, so nothing downstream has to handle them. */
 	private static void check(double amount, int position) throws MathError {
 		if (Double.isNaN(amount)) throw new MathError("That is not a number", position);
-		if (Double.isInfinite(amount)) throw new MathError("Result is too big to represent", position);
+		if (Double.isInfinite(amount)) throw new MathError("Result is too big to represent", position,
+				MathError.Kind.TOO_BIG);
 	}
 
 	private Token peek() {
@@ -485,7 +490,8 @@ public final class MathParser {
 			} catch (NumberFormatException e) {
 				throw new MathError("'" + text + "' is not a number", start);
 			}
-			if (Double.isInfinite(amount)) throw new MathError("Number is too big", start);
+			if (Double.isInfinite(amount)) throw new MathError("Number is too big", start,
+						MathError.Kind.TOO_BIG);
 
 			// Look ahead for a unit, with or without a space: "3st" and "3456 items".
 			int scan = i;

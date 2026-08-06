@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -31,8 +32,13 @@ public final class MathConfig {
 			# Change something here and run /math reload. No restart needed, EXCEPT for
 			# short_alias and alias, which build the command tree at server start.
 			#
-			# short_alias: register /math as well as /w4ve math.
-			# alias: the short command name. Change it if another mod already took it.
+			# short_alias: register the short commands as well as /w4ve math.
+			# aliases: the short command names, comma separated. /m is there because
+			#   typing /math to add two numbers gets old. Drop any that another mod
+			#   already took.
+			# funny_errors: put a joke in front of the reason an expression failed.
+			#   The reason itself never goes away, so the error still tells you what
+			#   to fix. Set it to false for a calculator with no opinions.
 			# max_length: longest expression accepted, in characters.
 			# max_depth: how deep brackets and nested calls may go.
 			# max_exponent: biggest exponent allowed, so 9^9^9 bounces with a message
@@ -49,7 +55,8 @@ public final class MathConfig {
 
 	static {
 		DEFAULTS.put("short_alias", "true");
-		DEFAULTS.put("alias", "math");
+		DEFAULTS.put("aliases", "math, m");
+		DEFAULTS.put("funny_errors", "true");
 		DEFAULTS.put("max_length", "256");
 		DEFAULTS.put("max_depth", "16");
 		DEFAULTS.put("max_exponent", "64");
@@ -66,11 +73,34 @@ public final class MathConfig {
 		return getBoolean("short_alias", true);
 	}
 
-	/** The short command name, sanitised: Brigadier only accepts word characters. */
+	/**
+	 * The short command names, sanitised: Brigadier only accepts word characters.
+	 *
+	 * <p>A config written before 1.1.0 has the old single {@code alias} key instead.
+	 * It is still honoured, because silently ignoring a setting somebody chose is
+	 * worse than carrying one extra line of code.
+	 */
+	public List<String> aliases() {
+		String raw = values.containsKey("aliases")
+				? get("aliases", "math, m")
+				: get("alias", "math");
+		List<String> out = new ArrayList<>();
+		for (String piece : raw.split(",")) {
+			String cleaned = piece.trim().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9_-]", "");
+			// "w4ve" would collide with the root command this hangs off.
+			if (cleaned.isEmpty() || cleaned.equals("w4ve") || out.contains(cleaned)) continue;
+			out.add(cleaned);
+		}
+		return out.isEmpty() ? List.of("math") : out;
+	}
+
+	/** The first alias, which is the one shown in help text and examples. */
 	public String alias() {
-		String raw = get("alias", "math").trim().toLowerCase(java.util.Locale.ROOT);
-		String cleaned = raw.replaceAll("[^a-z0-9_-]", "");
-		return cleaned.isEmpty() ? "math" : cleaned;
+		return aliases().get(0);
+	}
+
+	public boolean funnyErrors() {
+		return getBoolean("funny_errors", true);
 	}
 
 	public int decimals() {
@@ -136,7 +166,17 @@ public final class MathConfig {
 			if (!DEFAULTS.containsKey(key)) config.unknown.add(key);
 		}
 
-		boolean added = false;
+		// Before 1.1.0 there was a single `alias`. Carry the chosen name over to the
+		// new key, or the top up below would hand them the default list and quietly
+		// undo a decision they made.
+		boolean migrated = false;
+		if (config.values.containsKey("alias") && !config.values.containsKey("aliases")) {
+			config.values.put("aliases", config.values.remove("alias"));
+			config.unknown.remove("alias");
+			migrated = true;
+		}
+
+		boolean added = migrated;
 		for (Map.Entry<String, String> fallback : DEFAULTS.entrySet()) {
 			if (!config.values.containsKey(fallback.getKey())) {
 				config.values.put(fallback.getKey(), fallback.getValue());
