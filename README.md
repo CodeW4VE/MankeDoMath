@@ -10,10 +10,10 @@ items is, how long something takes to fill.
 and ships the tree to a vanilla client, which autocompletes it on its own.
 
 ```
-/math 3456 items in sh      ->  2 shulkers
-/math 5sh / 2h              ->  4320 items/hour (2.5 sh/hour)
+/math 3456 items in sb      ->  2 shulkers
+/math 5sb / 2h              ->  4320 items/hour (2.5 sb/hour)
 /math (16*16*64) in st      ->  256 stacks, what one chunk section is worth
-/math 20st in sh            ->  0.7407 shulkers
+/math 20st in sb            ->  0.7407 shulkers
 /math 1h + 30m              ->  108000 ticks (1h 30m)
 ```
 
@@ -38,25 +38,26 @@ This is the part that makes it a Minecraft calculator rather than a calculator.
 | Suffix | Is | Example |
 | --- | --- | --- |
 | `st` | stack, 64 | `3st` = 192 |
-| `sh` | shulker, 27 stacks | `2sh` = 3456 |
+| `sb` | shulker box, 27 stacks | `2sb` = 3456 |
 | `dc` | double chest, 54 stacks | `1dc` = 3456 |
 | `t` | ticks | `600t` = 30s |
 | `s` `m` `h` | seconds, minutes, hours | `1h` = 72000t |
 | `b` `c` `r` | blocks, chunks, regions | `2c` = 32 blocks |
 
-Longer spellings work too (`stacks`, `shulkers`, `items`, `minutes`, `chunks`),
-with or without a space after the number.
+Longer spellings work too (`stacks`, `shulkerboxes`, `items`, `minutes`, `chunks`),
+with or without a space after the number. `sh` is still accepted for a shulker
+box if that is what your fingers already do.
 
 Convert with `in`:
 
 ```
-/math 3456 items in sh
+/math 3456 items in sb
 /math 100 blocks in c
-/math 5sh in st
+/math 5sb in st
 ```
 
-Units carry through the arithmetic, so the mod knows that `5sh / 2h` is a rate
-and prints it per hour, and that `1sh + 1h` is a question with no answer.
+Units carry through the arithmetic, so the mod knows that `5sb / 2h` is a rate
+and prints it per hour, and that `1sb + 1h` is a question with no answer.
 
 **Operators**: `+ - * / % ^`, brackets, and a lone `x` between numbers as
 multiplication. **Functions**: `sqrt min max abs floor ceil round log ln`.

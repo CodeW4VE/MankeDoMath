@@ -150,12 +150,12 @@ public final class MathCommand {
 		source.sendSuccess(() -> prefix()
 				.append(Component.literal("A calculator that knows what a shulker is.")
 						.withStyle(ChatFormatting.GRAY)), false);
-		example(source, name, "3456 items in sh", "how many shulkers that is");
-		example(source, name, "5sh / 2h", "items per hour");
+		example(source, name, "3456 items in sb", "how many shulkers that is");
+		example(source, name, "5sb / 2h", "items per hour");
 		example(source, name, "(16*16*64) in st", "stacks in a chunk section");
-		example(source, name, "20st in sh", "part of a shulker");
+		example(source, name, "20st in sb", "part of a shulker");
 		source.sendSuccess(() -> Component.literal("  units: ").withStyle(ChatFormatting.DARK_GRAY)
-				.append(Component.literal("st sh dc items · t s m h · b c r")
+				.append(Component.literal("st sb dc items · t s m h · b c r")
 						.withStyle(ChatFormatting.WHITE)), false);
 		source.sendSuccess(() -> Component.literal("  functions: ").withStyle(ChatFormatting.DARK_GRAY)
 				.append(Component.literal(String.join(" ", MathParser.functionNames()))

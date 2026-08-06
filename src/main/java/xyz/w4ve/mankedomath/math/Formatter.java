@@ -79,7 +79,7 @@ public final class Formatter {
 			String main = number(perHour, decimals) + " items/hour";
 			double perHourShulkers = perHour / (27 * 64);
 			if (Math.abs(perHourShulkers) >= 0.1) {
-				return main + " (" + number(perHourShulkers, decimals) + " sh/hour)";
+				return main + " (" + number(perHourShulkers, decimals) + " sb/hour)";
 			}
 			return main;
 		}
@@ -99,7 +99,7 @@ public final class Formatter {
 	/** Big item counts said in the containers people actually carry. */
 	private static String itemHint(double items, int decimals) {
 		double magnitude = Math.abs(items);
-		if (magnitude >= 27 * 64) return number(items / (27 * 64), decimals) + " sh";
+		if (magnitude >= 27 * 64) return number(items / (27 * 64), decimals) + " sb";
 		if (magnitude >= 64) return number(items / 64.0, decimals) + " st";
 		return null;
 	}

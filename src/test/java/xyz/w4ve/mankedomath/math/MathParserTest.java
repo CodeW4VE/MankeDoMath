@@ -77,11 +77,21 @@ class MathParserTest {
 	@Test
 	void suffixesBecomeBaseUnits() throws MathError {
 		assertEquals(192, amount("3st"));
-		assertEquals(3456, amount("2sh"));
+		assertEquals(3456, amount("2sb"));
 		assertEquals(3456, amount("1dc"));
 		assertEquals(600, amount("30s"));
 		assertEquals(72000, amount("1h"));
 		assertEquals(32, amount("2c"));
+	}
+
+	@Test
+	void shulkerBoxAnswersToBothSpellings() throws MathError {
+		// `sb` is what people say, `sh` was the first spelling and still works.
+		assertEquals(amount("2sb"), amount("2sh"));
+		assertEquals(amount("2sb"), amount("2 shulkerboxes"));
+		assertEquals(amount("2sb"), amount("2 shulkers"));
+		// But the short hint prints the one people asked for.
+		assertEquals("3456 items (2 sb)", show("2sh"));
 	}
 
 	@Test
@@ -94,25 +104,25 @@ class MathParserTest {
 	void unitWordCanBeSeparatedBySpace() throws MathError {
 		assertEquals(3456, amount("3456 items"));
 		// The value stays in base units; the conversion happens on the way out.
-		assertEquals(3456, amount("3456 items in sh"));
-		assertEquals("2 shulkers", show("3456 items in sh"));
+		assertEquals(3456, amount("3456 items in sb"));
+		assertEquals("2 shulkers", show("3456 items in sb"));
 	}
 
 	@Test
 	void conversionWithIn() throws MathError {
-		assertEquals("2 shulkers", show("3456 items in sh"));
+		assertEquals("2 shulkers", show("3456 items in sb"));
 		assertEquals("256 stacks", show("(16*16*64) in st"));
 		assertEquals("30 seconds", show("600t in s"));
 		// One of something is not plural.
 		assertEquals("1 double chest", show("3456 items in dc"));
-		assertEquals("2 shulkers", show("3456 in sh"));
+		assertEquals("2 shulkers", show("3456 in sb"));
 		// 20 stacks is 1280 items, which is not a whole shulker.
-		assertEquals(0.7407, eval("20st in sh").value().amount() / (27 * 64), 1e-4);
+		assertEquals(0.7407, eval("20st in sb").value().amount() / (27 * 64), 1e-4);
 	}
 
 	@Test
 	void divisionByTimeGivesARate() throws MathError {
-		MathParser.Result result = eval("5sh / 2h");
+		MathParser.Result result = eval("5sb / 2h");
 		assertEquals(Dim.RATE, result.value().dim());
 		// 5 shulkers is 8640 items, spread over two hours.
 		assertTrue(Formatter.describe(result, 4).startsWith("4320 items/hour"));
@@ -232,7 +242,7 @@ class MathParserTest {
 
 	@Test
 	void itemCountsGetAContainerHint() throws MathError {
-		assertEquals("3456 items (2 sh)", show("3456 items"));
+		assertEquals("3456 items (2 sb)", show("3456 items"));
 		assertEquals("192 items (3 st)", show("3st"));
 		assertEquals("32 items", show("32 items"));
 	}

@@ -29,7 +29,9 @@ public final class Units {
 		Unit doubleChest = new Unit("double chests", 54 * 64, Dim.ITEM);
 		put(item, "item", "items", "i");
 		put(stack, "st", "stack", "stacks");
-		put(shulker, "sh", "shulker", "shulkers", "box");
+		// `sb` is the one people reach for, since the block is a shulker box.
+		// `sh` still works so nothing anyone already typed stops working.
+		put(shulker, "sb", "sh", "shulker", "shulkers", "shulkerbox", "shulkerboxes", "box");
 		put(doubleChest, "dc", "doublechest", "doublechests");
 
 		Unit tick = new Unit("ticks", 1, Dim.TIME);
