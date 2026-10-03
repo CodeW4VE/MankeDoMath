@@ -20,6 +20,12 @@ and ships the tree to a vanilla client, which autocompletes it on its own.
 Results are only visible to whoever asked. A calculator that shouts into public
 chat is a calculator people turn off.
 
+## Installation
+
+Supports Minecraft 1.21 through 26.3. Download the jar for your Minecraft version from [GitHub Releases](https://github.com/CodeW4VE/MankeDoMath/releases) or [Modrinth](https://modrinth.com/mod/mankedomath), put it in the server's `mods/` folder and restart. Players do not need the mod.
+
+Minecraft 26.3 requires Java 25, Fabric Loader 0.19.5 or newer and Fabric API for 26.3. Earlier 1.21 versions use Java 21. Replace the old jar when updating and retain `config/mankedomath.conf` to keep your settings.
+
 ## Commands
 
 | Command | What it does |
