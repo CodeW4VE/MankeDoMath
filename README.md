@@ -2,12 +2,11 @@
 
 A calculator inside Minecraft that knows what a shulker is.
 
-Quick sums without leaving the game or reaching for your phone, aimed at what a
-technical player actually works out: farm rates, how many shulkers a pile of
+Quick sums without leaving the game: farm rates, how many shulkers a pile of
 items is, how long something takes to fill.
 
-**Server-side only.** Players install nothing. The server registers the command
-and ships the tree to a vanilla client, which autocompletes it on its own.
+**Server-side only.** Players install nothing, and vanilla clients still get
+autocomplete for the command.
 
 ```
 /m 3456 items in sb      ->  2 shulkers
@@ -17,8 +16,7 @@ and ships the tree to a vanilla client, which autocompletes it on its own.
 /m 1h + 30m              ->  108000 ticks (1h 30m)
 ```
 
-Results are only visible to whoever asked. A calculator that shouts into public
-chat is a calculator people turn off.
+Results are only shown to whoever asked. `/math share` posts one to public chat.
 
 ## Installation
 
@@ -32,15 +30,13 @@ Minecraft 26.3 requires Java 25, Fabric Loader 0.19.5 or newer and Fabric API fo
 | --- | --- |
 | `/w4ve math <expression>` | The canonical spelling |
 | `/math <expression>` | Short alias |
-| `/m <expression>` | Shorter still, because typing `/math` to add two numbers gets old |
+| `/m <expression>` | Shortest alias |
 | `/math help` | The examples above, clickable |
 | `/math ans` | Your last result. Works inside expressions too: `/math ans / 64` |
-| `/math share <expression>` | The one thing that does reach public chat |
+| `/math share <expression>` | Post the result to public chat |
 | `/math reload` | Rereads the config (operator level 2) |
 
 ## Units
-
-This is the part that makes it a Minecraft calculator rather than a calculator.
 
 | Suffix | Is | Example |
 | --- | --- | --- |
@@ -63,11 +59,13 @@ Convert with `in`:
 /math 5sb in st
 ```
 
-Units carry through the arithmetic, so the mod knows that `5sb / 2h` is a rate
-and prints it per hour, and that `1sb + 1h` is a question with no answer.
+Units carry through the arithmetic: `5sb / 2h` is printed as a rate per hour,
+and `1sb + 1h` is an error.
 
 **Operators**: `+ - * / % ^`, brackets, and a lone `x` between numbers as
 multiplication. **Functions**: `sqrt min max abs floor ceil round log ln`.
+
+<!-- modrinth:end -->
 
 ## When you get it wrong
 
@@ -78,21 +76,17 @@ multiplication. **Functions**: `sqrt min max abs floor ceil round log ln`.
 /m banana     ->  manke can do math but no reading minds. Unknown name 'banana'
 ```
 
-The joke never replaces the reason, it only introduces it, and Brigadier still
-underlines the exact character that broke. A funny error that leaves you stuck
-stops being funny the second time. Set `funny_errors=false` for a calculator
-with no opinions.
+The joke always comes with the real reason, and the exact character that broke
+is underlined. Set `funny_errors=false` to drop the jokes.
 
 ## Safety
 
-There is no `eval` here, and no scripting engine. The parser is hand written
-and reads one small grammar and nothing else, because putting an interpreter on
-a public server so people can add two numbers is opening the door to whoever
-walks by.
+There is no `eval` and no scripting engine. The parser is hand written and only
+reads this small math grammar, so it cannot run anything else on the server.
 
 Expression length, nesting depth and operation count are all checked before a
 single multiplication happens, and the exponent cap is checked before each power
-is computed, so `9^9^9` bounces with a message instead of eating a tick. All four
+is computed, so `9^9^9` is refused with a message instead of lagging the server. All four
 limits are in the config.
 
 ## Config
