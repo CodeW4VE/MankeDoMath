@@ -16,6 +16,8 @@ autocomplete for the command.
 /m 1h + 30m              ->  108000 ticks (1h 30m)
 ```
 
+![Four sums and a division by zero, in chat](docs/img/chat.png)
+
 Results are only shown to whoever asked. `/math share` posts one to public chat.
 
 ## Installation
